@@ -19,6 +19,12 @@ const mascotasRoutes = require('./routes/mascotas.routes');
 const pagosRoutes = require('./routes/pagos.routes');
 const tratamientosRoutes = require('./routes/tratamientos.routes');
 const veterinariosRoutes = require('./routes/veterinarios.routes');
+const citaTratamientosRoutes = require('./routes/citaTratamientos.routes');
+const citasCrudRoutes = require('./routes/citasCrud.routes');
+const pagosCrudRoutes = require('./routes/pagosCrud.routes');
+const propietariosCrudRoutes = require('./routes/propietariosCrud.routes');
+const tratamientosCrudRoutes = require('./routes/tratamientosCrud.routes');
+const veterinariosCrudRoutes = require('./routes/veterinariosCrud.routes');
 
 
 // Registrar rutas
@@ -28,5 +34,11 @@ app.use('/api/mascotas', mascotasRoutes);
 app.use('/api/pagos', pagosRoutes);
 app.use('/api/tratamientos', tratamientosRoutes);
 app.use('/api/veterinarios', veterinariosRoutes);
+app.use('/api/cita-tratamientos', citaTratamientosRoutes);
+app.use('/api/citas', citasCrudRoutes);
+app.use('/api/pagos-crud', pagosCrudRoutes);
+app.use('/api/propietarios-crud', propietariosCrudRoutes);
+app.use('/api/tratamientos-crud', tratamientosCrudRoutes);
+app.use('/api/veterinarios-crud', veterinariosCrudRoutes);
 
 module.exports = app;
