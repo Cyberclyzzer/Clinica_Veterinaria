@@ -25,6 +25,7 @@ const pagosCrudRoutes = require('./routes/pagosCrud.routes');
 const propietariosCrudRoutes = require('./routes/propietariosCrud.routes');
 const tratamientosCrudRoutes = require('./routes/tratamientosCrud.routes');
 const veterinariosCrudRoutes = require('./routes/veterinariosCrud.routes');
+const mascotasCrudRoutes = require('./routes/mascotasCrud.routes');
 
 
 // Registrar rutas
@@ -40,5 +41,6 @@ app.use('/api/pagos-crud', pagosCrudRoutes);
 app.use('/api/propietarios-crud', propietariosCrudRoutes);
 app.use('/api/tratamientos-crud', tratamientosCrudRoutes);
 app.use('/api/veterinarios-crud', veterinariosCrudRoutes);
+app.use('/api/mascotas-crud', mascotasCrudRoutes);
 
 module.exports = app;
