@@ -6,8 +6,14 @@ require('dotenv').config();
 
 const app = express();
 
+// Permitir al frontend interactuar con la API
+const corsOptions = {
+    origin: process.env.FRONTEND_URL
+};
+  
+
 // Middlewares
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(helmet());
 app.use(express.json());
 app.use(morgan('dev'));
