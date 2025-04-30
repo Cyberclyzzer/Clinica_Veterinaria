@@ -5,7 +5,8 @@ const controller = require('../controllers/usuariosCrud.controller');
 const {
   validateUsuarioBody,
   validateUsuarioId,
-  validateUsuarioEmailParam
+  validateUsuarioEmailParam,
+  validarLoginInput
 } = require('../validators/usuariosCrud.validator');
 
 const validarCampos = (req, res, next) => {
@@ -33,5 +34,7 @@ router.put('/:id', [...validateUsuarioId, ...validateUsuarioBody], validarCampos
 
 // Eliminar
 router.delete('/:id', validateUsuarioId, validarCampos, controller.eliminarUsuario);
+
+router.post('/login',validarLoginInput,controller.login)
 
 module.exports = router;
