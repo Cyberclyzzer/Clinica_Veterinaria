@@ -67,6 +67,13 @@ CREATE TABLE IF NOT EXISTS pagos (
   estado_pago VARCHAR(20)
 );
 
+-- Crear tabla usuarios
+CREATE TABLE IF NOT EXISTS usuarios (
+  id SERIAL PRIMARY KEY,
+  nombre VARCHAR(50),
+  password VARCHAR(50)
+);
+
     `);
 
     console.log('✅ Tablas creadas correctamente');
