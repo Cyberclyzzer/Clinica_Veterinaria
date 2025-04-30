@@ -1,4 +1,5 @@
 const pool = require('../db/index');
+const bcrypt = require('bcrypt');   // Importamos bcrypt para comparar las contraseñas
 
 // Crear usuario
 exports.crearUsuario = async (req, res) => {
@@ -87,5 +88,44 @@ exports.eliminarUsuario = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Error al eliminar usuario' });
+  }
+};
+
+// --- Función que maneja la lógica del login ---
+exports.login = async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    // Buscar usuario por email en la base de datos
+    const result = await pool.query(
+      'SELECT id, email, password FROM usuarios WHERE email = $1',
+      [email]
+    );
+
+    // Si el usuario no existe
+    if (result.rowCount === 0) {
+      return res.status(401).json({ message: 'Credenciales inválidas' });
+    }
+
+    const user = result.rows[0]; // Obtenemos el primer usuario
+
+    // Verificamos que la contraseña ingresada coincida con la almacenada (bcrypt.compare)
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordValid) {
+      return res.status(401).json({ message: 'Credenciales inválidas' });
+    }
+
+    // Si las credenciales son válidas, retornamos un mensaje de éxito
+    res.status(200).json({
+      message: 'Login exitoso',
+      user: {
+        id: user.id,
+        email: user.email
+      }
+    });
+  } catch (err) {
+    console.error('Error en el login:', err);
+    res.status(500).json({ message: 'Error interno del servidor' });
   }
 };
