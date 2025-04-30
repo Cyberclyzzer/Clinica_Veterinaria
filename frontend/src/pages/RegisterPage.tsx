@@ -4,7 +4,7 @@ import { Shield } from 'lucide-react';
 import useAuthStore from '../store/authStore';
 import Button from '../components/ui/Button';
 
-const LoginPage = () => {
+const RegisterPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { login, loading, error } = useAuthStore();
@@ -18,33 +18,25 @@ const LoginPage = () => {
     e.preventDefault();
     
     try {
-      await login(email, password);
-      
-      // Get the current user again to determine where to navigate
-      const user = useAuthStore.getState().user;
-      
-      if (user) {
-        // Navigate based on user role
-        if (user.role === 'owner') {
-          navigate('/owner');
-        } else {
-          navigate('/staff');
+        const response = await fetch('https://api.example.com/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email, password }),
+        });
+    
+        if (!response.ok) {
+          throw new Error('Error al registrar el usuario');
         }
+    
+        const data = await response.json();
+        console.log('Registro exitoso:', data);
+    
+        navigate(from, { replace: true });
+      } catch (err) {
+        console.error('Error durante el registro:', err);
       }
-    } catch (error) {
-      console.error('Login failed:', error);
-    }
-  };
-  
-  // For demo purposes, provide quick login options
-  const loginAsStaff = async () => {
-    await login('staff@example.com', 'password');
-    navigate('/staff');
-  };
-  
-  const loginAsOwner = async () => {
-    await login('owner@example.com', 'password');
-    navigate('/owner');
   };
   
   return (
@@ -54,7 +46,7 @@ const LoginPage = () => {
           <Shield className="mx-auto h-12 w-auto text-primary-600" />
         </div>
         <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          Sign in to your account
+          Crear una cuenta
         </h2>
         <p className="mt-2 text-center text-sm text-gray-600">
           Access your veterinary clinic portal
@@ -106,32 +98,6 @@ const LoginPage = () => {
               </div>
             </div>
             
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <input
-                  id="remember-me"
-                  name="remember-me"
-                  type="checkbox"
-                  className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
-                />
-                <label 
-                  htmlFor="remember-me" 
-                  className="ml-2 block text-sm text-gray-900"
-                >
-                  Remember me
-                </label>
-              </div>
-              
-              <div className="text-sm">
-                <Link 
-                  to="/forgot-password" 
-                  className="font-medium text-primary-600 hover:text-primary-500"
-                >
-                  Forgot your password?
-                </Link>
-              </div>
-            </div>
-            
             {error && (
               <div className="text-sm text-error-600 bg-error-50 p-2 rounded">
                 {error}
@@ -144,57 +110,24 @@ const LoginPage = () => {
                 fullWidth
                 isLoading={loading}
               >
-                Sign in
+                Register
               </Button>
             </div>
           </form>
 
           <div className='text-sm'>
               <Link 
-                to="/register" 
+                to="/login" 
                 className="font-medium text-primary-600 hover:text-primary-500"
               >
-                No tienes cuenta? Registrate
+                Tienes una cuenta? Inicia sesion
               </Link>
           </div>
           
-          <div className="mt-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300" />
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">Demo Quick Login</span>
-              </div>
-            </div>
-            
-            <div className="mt-6 grid grid-cols-2 gap-3">
-              <div>
-                <Button
-                  variant="outline"
-                  fullWidth
-                  onClick={loginAsStaff}
-                  disabled={loading}
-                >
-                  Staff Demo
-                </Button>
-              </div>
-              <div>
-                <Button
-                  variant="outline"
-                  fullWidth
-                  onClick={loginAsOwner}
-                  disabled={loading}
-                >
-                  Pet Owner Demo
-                </Button>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>
   );
 };
 
-export default LoginPage;
+export default RegisterPage;
