@@ -8,6 +8,7 @@ import { UserRole } from './types/index';
 
 // Lazy load pages to improve initial load time
 const LoginPage = lazy(() => import('./pages/LoginPage'));
+const RegisterPage = lazy(() => import('./pages/RegisterPage'));
 const StaffDashboard = lazy(() => import('./pages/staff/StaffDashboard'));
 const AppointmentsPage = lazy(() => import('./pages/staff/AppointmentsPage'));
 const TreatmentsPage = lazy(() => import('./pages/staff/TreatmentsPage'));
@@ -24,6 +25,7 @@ function App() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
         
         {/* Staff Routes */}
         <Route 
