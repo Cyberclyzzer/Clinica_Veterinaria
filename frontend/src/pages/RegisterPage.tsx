@@ -7,7 +7,7 @@ import Button from '../components/ui/Button';
 const RegisterPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { login, loading, error } = useAuthStore();
+  const { loading, error } = useAuthStore();
   const navigate = useNavigate();
   const location = useLocation();
   
@@ -18,7 +18,7 @@ const RegisterPage = () => {
     e.preventDefault();
     
     try {
-        const response = await fetch('https://api.example.com/register', {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/usuarios-crud`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
