@@ -33,6 +33,7 @@ const tratamientosCrudRoutes = require('./routes/tratamientosCrud.routes');
 const veterinariosCrudRoutes = require('./routes/veterinariosCrud.routes');
 const mascotasCrudRoutes = require('./routes/mascotasCrud.routes');
 const usuariosCrudRoutes = require('./routes/usuariosCrud.routes');
+const nodemon = require('nodemon');
 
 
 // Registrar rutas
