@@ -12,12 +12,13 @@ const LoginPage = () => {
   const location = useLocation();
   
   // Get the path to redirect to after login (or default to appropriate dashboard)
-  // Removed unused 'from' variable
+  const from = location.state?.from?.pathname || '/';
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     
+    
     try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/usuarios-crud`, {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/usuarios/login`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -26,15 +27,16 @@ const LoginPage = () => {
         });
     
         if (!response.ok) {
-          throw new Error('Error al registrar el usuario');
+          throw new Error('Error al iniciar sesion');
         }
     
         const data = await response.json();
-        console.log('Registro exitoso:', data);
+        console.log('Inicio de sesion exitoso:', data);
     
-        navigate(from, { replace: true });
+        navigate('/owner');
+
       } catch (err) {
-        console.error('Error durante el registro:', err);
+        console.error('Error durante el inicio de sesion:', err);
       }
   };
 
