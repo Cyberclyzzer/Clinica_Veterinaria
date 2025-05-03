@@ -67,11 +67,13 @@ CREATE TABLE IF NOT EXISTS pagos (
   estado_pago VARCHAR(20)
 );
 
--- Crear tabla usuarios
 CREATE TABLE IF NOT EXISTS usuarios (
   id SERIAL PRIMARY KEY,
-  email VARCHAR(50),
-  password VARCHAR(50)
+  username VARCHAR(50) UNIQUE NOT NULL,
+  email VARCHAR(100) UNIQUE NOT NULL,
+  password VARCHAR(255) NOT NULL,
+  rol_id INTEGER NOT NULL CHECK (rol_id IN (1,2,3,4)),
+  creado_en TIMESTAMP DEFAULT NOW()
 );
 
     `);
