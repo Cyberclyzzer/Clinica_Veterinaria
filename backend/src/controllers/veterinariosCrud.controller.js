@@ -2,13 +2,13 @@ const pool = require('../db/index');
 
 // Crear nuevo veterinario
 exports.crearVeterinario = async (req, res) => {
-  const { nombre, especialidad, telefono_contacto } = req.body;
+  const { nombre, especialidad, telefono_contacto, horario_atencion } = req.body;
   try {
     const result = await pool.query(`
-      INSERT INTO veterinarios (nombre, especialidad, telefono_contacto)
-      VALUES ($1, $2, $3)
+      INSERT INTO veterinarios (nombre, especialidad, telefono_contacto, horario_atencion)
+      VALUES ($1, $2, $3, $4)
       RETURNING *
-    `, [nombre, especialidad, telefono_contacto]);
+    `, [nombre, especialidad, telefono_contacto, horario_atencion]);
     res.status(201).json(result.rows[0]);
   } catch (error) {
     console.error(error);
