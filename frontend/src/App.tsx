@@ -46,9 +46,7 @@ function App() {
         <Route 
           path="/owner" 
           element={
-            <ProtectedRoute allowedRoles={[UserRole.OWNER]}>
               <Layout />
-            </ProtectedRoute>
           }
         >
           <Route index element={<OwnerDashboard />} />

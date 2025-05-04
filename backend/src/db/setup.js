@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS veterinarios (
   id SERIAL PRIMARY KEY,
   nombre VARCHAR(50) NOT NULL,
   especialidad VARCHAR(50),
-  telefono VARCHAR(100),
+  telefono_contacto VARCHAR(100),
   horario_atencion VARCHAR(20)
 );
 
@@ -73,7 +73,8 @@ CREATE TABLE IF NOT EXISTS usuarios (
   password VARCHAR(255) NOT NULL,
   rol_id INTEGER NOT NULL CHECK (rol_id IN (1,2,3,4)),
   estado BOOLEAN DEFAULT TRUE,
-  fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  propietario_id INTEGER REFERENCES propietarios(id) ON DELETE CASCADE
 );
 
 

@@ -4,7 +4,7 @@ const pool = require('../db/index');
 exports.listarVeterinarios = async (req, res) => {
   try {
     const result = await pool.query(`
-      SELECT id, nombre, especialidad, telefono_contacto
+      SELECT id, nombre, especialidad, telefono_contacto, horario_atencion
       FROM veterinarios
       ORDER BY nombre
     `);
