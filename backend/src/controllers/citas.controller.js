@@ -78,3 +78,41 @@ exports.historialCitasMascota = async (req, res) => {
     res.status(500).json({ message: 'Error obteniendo historial de citas' });
   }
 };
+
+exports.obtenerCitasUsuario = async (req, res) => {
+  try {
+    const userId = req.userId; // asumimos que un middleware ya lo puso
+
+    // buscar al propietario vinculado al usuario
+    const propietarioResult = await pool.query(
+      'SELECT id FROM propietarios WHERE usuario_id = $1',
+      [userId]
+    );
+
+    if (propietarioResult.rowCount === 0) {
+      return res.status(404).json({ message: 'No tienes mascotas registradas' });
+    }
+
+    const propietarioId = propietarioResult.rows[0].id;
+
+    // buscar las citas de las mascotas del propietario
+    const citasResult = await pool.query(`
+      SELECT 
+        c.id AS cita_id,
+        m.nombre AS nombre_mascota,
+        c.fecha_hora,
+        c.motivo,
+        v.nombre AS veterinario_nombre
+      FROM citas c
+      JOIN mascotas m ON c.mascota_id = m.id
+      JOIN veterinarios v ON c.veterinario_id = v.id
+      WHERE m.propietario_id = $1
+      ORDER BY c.fecha_hora DESC
+    `, [propietarioId]);
+
+    return res.json(citasResult.rows);
+  } catch (error) {
+    console.error('Error al obtener citas del usuario:', error);
+    return res.status(500).json({ message: 'Error del servidor' });
+  }
+};
