@@ -78,7 +78,6 @@ exports.historialCitasMascota = async (req, res) => {
     res.status(500).json({ message: 'Error obteniendo historial de citas' });
   }
 };
-const pool = require('../db');
 
 exports.obtenerCitasPorPropietario = async (req, res) => {
   try {
