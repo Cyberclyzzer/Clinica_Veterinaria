@@ -17,8 +17,9 @@ const validarCampos = (req, res, next) => {
   next();
 };
 
-// Ruta para obtener las citas del usuario autenticado
-router.get('/mis-citas', citasController.obtenerCitasUsuario);
+// Endpoint para obtener citas de un propietario
+router.get('/propietario/:propietarioId', citasController.obtenerCitasPorPropietario);
+
 // Listar citas de hoy
 router.get('/hoy', citasController.listarCitasHoy);
 

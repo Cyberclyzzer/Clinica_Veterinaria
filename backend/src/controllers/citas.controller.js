@@ -78,24 +78,27 @@ exports.historialCitasMascota = async (req, res) => {
     res.status(500).json({ message: 'Error obteniendo historial de citas' });
   }
 };
+const pool = require('../db');
 
-exports.obtenerCitasUsuario = async (req, res) => {
+exports.obtenerCitasPorPropietario = async (req, res) => {
   try {
-    const userId = req.userId; // asumimos que un middleware ya lo puso
+    const propietarioId = parseInt(req.params.propietarioId);
 
-    // buscar al propietario vinculado al usuario
+    if (isNaN(propietarioId)) {
+      return res.status(400).json({ message: 'El ID de propietario debe ser un número' });
+    }
+
+    // Verificar que el propietario existe
     const propietarioResult = await pool.query(
-      'SELECT id FROM propietarios WHERE usuario_id = $1',
-      [userId]
+      'SELECT id FROM propietarios WHERE id = $1',
+      [propietarioId]
     );
 
     if (propietarioResult.rowCount === 0) {
-      return res.status(404).json({ message: 'No tienes mascotas registradas' });
+      return res.status(404).json({ message: 'Propietario no encontrado' });
     }
 
-    const propietarioId = propietarioResult.rows[0].id;
-
-    // buscar las citas de las mascotas del propietario
+    // Obtener las citas de las mascotas de ese propietario
     const citasResult = await pool.query(`
       SELECT 
         c.id AS cita_id,
@@ -107,12 +110,13 @@ exports.obtenerCitasUsuario = async (req, res) => {
       JOIN mascotas m ON c.mascota_id = m.id
       JOIN veterinarios v ON c.veterinario_id = v.id
       WHERE m.propietario_id = $1
-      ORDER BY c.fecha_hora DESC
+      ORDER BY c.fecha_hora DESC;
     `, [propietarioId]);
 
     return res.json(citasResult.rows);
+
   } catch (error) {
-    console.error('Error al obtener citas del usuario:', error);
+    console.error('❌ Error al obtener las citas del propietario:', error);
     return res.status(500).json({ message: 'Error del servidor' });
   }
 };
