@@ -81,17 +81,19 @@ exports.historialCitasMascota = async (req, res) => {
 
 exports.obtenerCitasPorPropietario = async (req, res) => {
   try {
-    const propietarioId = parseInt(req.params.propietarioId);
+    const userId = parseInt(req.params.userId);
 
-    if (isNaN(propietarioId)) {
-      return res.status(400).json({ message: 'El ID de propietario debe ser un número' });
+    if (isNaN(userId)) {
+      return res.status(400).json({ message: 'El ID de usuario debe ser un número' });
     }
 
     // Verificar que el propietario existe
     const propietarioResult = await pool.query(
-      'SELECT id FROM propietarios WHERE id = $1',
-      [propietarioId]
+      'SELECT propietario_id FROM usuarios WHERE id = $1',
+      [userId]
     );
+    const propietarioId = propietarioResult.rows[0]?.propietario_id;
+    console.log('Propietario ID:', propietarioId); // Debugging
 
     if (propietarioResult.rowCount === 0) {
       return res.status(404).json({ message: 'Propietario no encontrado' });

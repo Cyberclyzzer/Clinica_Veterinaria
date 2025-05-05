@@ -3,13 +3,13 @@ const bcrypt = require('bcrypt');
 
 exports.signup = async (req, res) => {
   try {
-    const { email, password, rol_id } = req.body;
+    const { email, password, rol_id, propietario_id } = req.body;
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const result = await pool.query(
-      'INSERT INTO usuarios (email, password, rol_id) VALUES ($1, $2, $3) RETURNING id, email, rol_id, estado, fecha_creacion',
-      [email, hashedPassword, rol_id]
+      'INSERT INTO usuarios (email, password, rol_id, propietario_id) VALUES ($1, $2, $3, $4) RETURNING id, email, rol_id, estado, fecha_creacion, propietario_id',
+      [email, hashedPassword, rol_id, propietario_id]
     );
 
     res.status(201).json({
