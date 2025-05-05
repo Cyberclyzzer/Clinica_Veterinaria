@@ -17,12 +17,12 @@ exports.createPropietario = async (req, res) => {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const { nombre, telefono, email, direccion } = req.body;
+  const { nombre, telefono, email, direccion, usuario_id } = req.body;
 
   try {
     const result = await pool.query(
-      `INSERT INTO propietarios (nombre, telefono, email, direccion) VALUES ($1, $2, $3, $4) RETURNING *`,
-      [nombre, telefono, email, direccion]
+      `INSERT INTO propietarios (nombre, telefono, email, direccion, usuario_id) VALUES ($1, $2, $3, $4, $5) RETURNING *`,
+      [nombre, telefono, email, direccion, usuario_id]
     );
     res.status(201).json(result.rows[0]);
   } catch (error) {

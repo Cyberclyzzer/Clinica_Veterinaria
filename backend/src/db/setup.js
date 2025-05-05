@@ -3,13 +3,24 @@ const pool = require('./index'); // tu conexión a PostgreSQL
 const crearTablas = async () => {
   try {
     await pool.query(`
+
+      -- Crear tabla usuarios
+CREATE TABLE IF NOT EXISTS usuarios (
+  id SERIAL PRIMARY KEY,
+  email VARCHAR(100) UNIQUE NOT NULL,
+  password VARCHAR(255) NOT NULL,
+  rol_id INTEGER NOT NULL CHECK (rol_id IN (1,2,3,4)),
+  estado BOOLEAN DEFAULT TRUE,
+  fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
       -- Crear tabla propietarios
 CREATE TABLE IF NOT EXISTS propietarios (
   id SERIAL PRIMARY KEY,
   nombre VARCHAR(50) NOT NULL,
   telefono VARCHAR(20),
   email VARCHAR(100),
-  direccion TEXT
+  direccion TEXT,
+  usuario_id INTEGER REFERENCES usuarios(id) ON DELETE CASCADE
 );
 
 -- Crear tabla veterinarios
@@ -18,7 +29,8 @@ CREATE TABLE IF NOT EXISTS veterinarios (
   nombre VARCHAR(50) NOT NULL,
   especialidad VARCHAR(50),
   telefono_contacto VARCHAR(100),
-  horario_atencion VARCHAR(20)
+  horario_atencion VARCHAR(20),
+  usuario_id INTEGER REFERENCES usuarios(id) ON DELETE CASCADE
 );
 
 -- Crear tabla mascotas
@@ -65,16 +77,6 @@ CREATE TABLE IF NOT EXISTS pagos (
   fecha_pago TIMESTAMP WITH TIME ZONE,
   metodo_pago VARCHAR(50),
   estado_pago VARCHAR(20)
-);
-
-CREATE TABLE IF NOT EXISTS usuarios (
-  id SERIAL PRIMARY KEY,
-  email VARCHAR(100) UNIQUE NOT NULL,
-  password VARCHAR(255) NOT NULL,
-  rol_id INTEGER NOT NULL CHECK (rol_id IN (1,2,3,4)),
-  estado BOOLEAN DEFAULT TRUE,
-  fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  propietario_id INTEGER REFERENCES propietarios(id) ON DELETE CASCADE
 );
 
 
