@@ -10,4 +10,7 @@ router.get('/', propietariosController.getAllPropietarios);
 // Crear nuevo
 router.post('/', validatePropietario, propietariosController.createPropietario);
 
+// Obtener propietario por ID de usuario
+router.get('/:usuario_id', propietariosController.getByUserId);
+
 module.exports = router;
