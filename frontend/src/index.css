@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -6,14 +6,19 @@
 
 @layer base {
   html {
-    font-family: 'Open Sans', system-ui, sans-serif;
+    font-family: "Open Sans", system-ui, sans-serif;
   }
-  
+
   body {
     @apply bg-gray-50 text-gray-900;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply font-semibold leading-tight;
   }
 
@@ -36,7 +41,7 @@
   }
 
   .btn-primary {
-    @apply bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500;
+    @apply bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500;
   }
 
   .btn-secondary {
@@ -44,11 +49,11 @@
   }
 
   .btn-accent {
-    @apply bg-accent-600 text-white hover:bg-accent-700 focus:ring-accent-500;
+    @apply bg-green-600 text-white hover:bg-green-700 focus:ring-green-500;
   }
 
   .btn-outline {
-    @apply border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 focus:ring-primary-500;
+    @apply border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 focus:ring-blue-500;
   }
 
   .card {
@@ -56,7 +61,7 @@
   }
 
   .input {
-    @apply block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500;
+    @apply block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500;
   }
 
   .label {
@@ -64,7 +69,7 @@
   }
 
   .select {
-    @apply block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500;
+    @apply block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500;
   }
 
   .form-group {
@@ -82,6 +87,74 @@
 
   .calendar-appointment {
     @apply rounded px-2 py-1 text-xs mb-1 truncate cursor-pointer transition-all hover:shadow-md;
+  }
+
+  /* Navy color classes for admin interface */
+  .bg-navy-50 {
+    @apply bg-slate-50;
+  }
+  .bg-navy-100 {
+    @apply bg-slate-100;
+  }
+  .bg-navy-200 {
+    @apply bg-slate-200;
+  }
+  .bg-navy-600 {
+    @apply bg-slate-700;
+  }
+  .bg-navy-700 {
+    @apply bg-slate-800;
+  }
+  .bg-navy-800 {
+    @apply bg-slate-900;
+  }
+  .bg-navy-900 {
+    @apply bg-black;
+  }
+
+  .text-navy-600 {
+    @apply text-slate-600;
+  }
+  .text-navy-700 {
+    @apply text-slate-700;
+  }
+  .text-navy-800 {
+    @apply text-slate-800;
+  }
+
+  .border-navy-200 {
+    @apply border-slate-200;
+  }
+  .border-navy-600 {
+    @apply border-slate-600;
+  }
+
+  .hover\:bg-navy-600:hover {
+    @apply hover:bg-slate-700;
+  }
+  .hover\:bg-navy-800:hover {
+    @apply hover:bg-slate-900;
+  }
+
+  .focus\:ring-navy-600:focus {
+    @apply focus:ring-slate-600;
+  }
+  .focus\:border-navy-600:focus {
+    @apply focus:border-slate-600;
+  }
+
+  .from-navy-600 {
+    @apply from-slate-700;
+  }
+  .from-navy-800 {
+    @apply from-slate-900;
+  }
+
+  .to-navy-600 {
+    @apply to-slate-700;
+  }
+  .to-navy-700 {
+    @apply to-slate-800;
   }
 }
 
