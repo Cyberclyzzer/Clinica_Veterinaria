@@ -2,13 +2,14 @@ const pool = require('../db/index');
 
 // Crear nuevo propietario
 exports.crearPropietario = async (req, res) => {
-  const { nombre, telefono, email, direccion } = req.body;
+  const { nombre, telefono, email, direccion, usuario_id } = req.body;
+  
   try {
     const result = await pool.query(`
-      INSERT INTO propietarios (nombre, telefono, email, direccion)
-      VALUES ($1, $2, $3, $4)
+      INSERT INTO propietarios (nombre, telefono, email, direccion, usuario_id)
+      VALUES ($1, $2, $3, $4, $5)
       RETURNING *
-    `, [nombre, telefono, email, direccion]);
+    `, [nombre, telefono, email, direccion, usuario_id]);
     res.status(201).json(result.rows[0]);
   } catch (error) {
     console.error(error);

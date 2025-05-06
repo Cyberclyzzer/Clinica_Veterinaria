@@ -89,11 +89,11 @@ exports.obtenerCitasPorPropietario = async (req, res) => {
 
     // Verificar que el propietario existe
     const propietarioResult = await pool.query(
-      'SELECT propietario_id FROM usuarios WHERE id = $1',
+      'SELECT id FROM propietarios WHERE usuario_id = $1',
       [userId]
     );
-    const propietarioId = propietarioResult.rows[0]?.propietario_id;
-    console.log('Propietario ID:', propietarioId); // Debugging
+
+    const propietarioId = propietarioResult.rows[0]?.id;
 
     if (propietarioResult.rowCount === 0) {
       return res.status(404).json({ message: 'Propietario no encontrado' });
