@@ -33,6 +33,7 @@ const tratamientosCrudRoutes = require('./routes/tratamientosCrud.routes');
 const veterinariosCrudRoutes = require('./routes/veterinariosCrud.routes');
 const mascotasCrudRoutes = require('./routes/mascotasCrud.routes');
 const usuariosRoutes = require('./routes/usuarios.routes');
+const recepcionistasRoutes = require('./routes/recepcionistas.routes');
 const nodemon = require('nodemon');
 
 
@@ -50,6 +51,7 @@ app.use('/api/propietarios-crud', propietariosCrudRoutes);
 app.use('/api/tratamientos-crud', tratamientosCrudRoutes);
 app.use('/api/veterinarios-crud', veterinariosCrudRoutes);
 app.use('/api/mascotas-crud', mascotasCrudRoutes);
+app.use('/api/recepcionistas', recepcionistasRoutes);
 app.use('/api/usuarios', usuariosRoutes);
 
 
