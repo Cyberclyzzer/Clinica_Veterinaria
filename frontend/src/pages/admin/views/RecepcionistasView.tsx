@@ -2,13 +2,14 @@
 
 import type React from "react"
 import { useEffect, useState } from "react"
-import { User, Search, Phone, Mail, Edit, Trash2, UserPlus } from "lucide-react"
+import { User, Search, Phone, Mail, Edit, Trash2, UserPlus, MapPin } from "lucide-react"
 
 interface Recepcionista {
   id: number
   nombre: string
   email: string
-  telefono?: string
+  telefono_contacto: string
+  direccion: string
 }
 
 const RecepcionistasView: React.FC = () => {
@@ -44,7 +45,7 @@ const RecepcionistasView: React.FC = () => {
         (recep) =>
           recep.nombre.toLowerCase().includes(term.toLowerCase()) ||
           recep.email.toLowerCase().includes(term.toLowerCase()) ||
-          (recep.telefono && recep.telefono.includes(term)),
+          (recep.telefono_contacto && recep.telefono_contacto.includes(term)),
       )
       setFilteredRecepcionistas(filtered)
     } else {
@@ -114,13 +115,13 @@ const RecepcionistasView: React.FC = () => {
                 </div>
                 <div className="space-y-2 text-gray-600 mb-4">
                   <p className="flex items-center">
-                    <Mail className="h-4 w-4 text-gray-400 mr-2" />
-                    {recep.email}
+                    <MapPin className="h-4 w-4 text-gray-400 mr-2" />
+                    {recep.direccion}
                   </p>
-                  {recep.telefono && (
+                  {recep.telefono_contacto && (
                     <p className="flex items-center">
                       <Phone className="h-4 w-4 text-gray-400 mr-2" />
-                      {recep.telefono}
+                      {recep.telefono_contacto}
                     </p>
                   )}
                 </div>
