@@ -56,7 +56,7 @@ function OwnerPetsView() {
     }
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/mascotas`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/mascotas-crud`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
