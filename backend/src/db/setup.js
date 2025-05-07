@@ -33,6 +33,15 @@ CREATE TABLE IF NOT EXISTS veterinarios (
   usuario_id INTEGER REFERENCES usuarios(id) ON DELETE CASCADE
 );
 
+-- Crear tabla recepcionistas
+CREATE TABLE IF NOT EXISTS recepcionistas (
+  id SERIAL PRIMARY KEY,
+  nombre VARCHAR(50) NOT NULL,
+  telefono_contacto VARCHAR(100),
+  direccion TEXT,
+  usuario_id INTEGER REFERENCES usuarios(id) ON DELETE CASCADE
+);
+
 -- Crear tabla mascotas
 CREATE TABLE IF NOT EXISTS mascotas (
   id SERIAL PRIMARY KEY,

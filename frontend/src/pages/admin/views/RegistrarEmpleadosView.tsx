@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { useState } from "react"
-import { UserPlus, Stethoscope, Phone, Mail, Calendar, User, Save, X } from "lucide-react"
+import { UserPlus, Stethoscope, Phone, Mail, Calendar, User, Save, X, MapPin, Briefcase, Info, IdCard } from "lucide-react"
 
 const RegistrarEmpleadosView: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -11,6 +11,8 @@ const RegistrarEmpleadosView: React.FC = () => {
     password: "",
     telefono: "",
     rol: "veterinario", // Valor por defecto
+    cedula: "", 
+    direccion: "",
     especialidad: "", // Campo adicional para veterinarios
     horario_atencion: "", // Campo adicional para veterinarios
   })
@@ -70,8 +72,11 @@ const RegistrarEmpleadosView: React.FC = () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
+            nombre: formData.nombre,
+            email: formData.email,
+            telefono_contacto: formData.telefono,
+            direccion: formData.direccion,
             usuario_id: usuarioId, // Relación con el usuario registrado
-            telefono: formData.telefono,
           }),
         })
 
@@ -87,6 +92,8 @@ const RegistrarEmpleadosView: React.FC = () => {
         password: "",
         telefono: "",
         rol: "veterinario",
+        cedula: "", 
+        direccion: "",
         especialidad: "",
         horario_atencion: "",
       })
@@ -199,7 +206,7 @@ const RegistrarEmpleadosView: React.FC = () => {
             {/* Tipo de empleado */}
             <div className="md:col-span-2 bg-gradient-to-br from-pink-50 to-pink-100 p-4 rounded-lg">
               <h3 className="text-lg font-medium text-pink-700 mb-4 flex items-center">
-                <Stethoscope className="h-5 w-5 mr-2" />
+                <Briefcase className="h-5 w-5 mr-2" />
                 Tipo de Empleado
               </h3>
               <div>
@@ -264,6 +271,56 @@ const RegistrarEmpleadosView: React.FC = () => {
                   </div>
                 </div>
               </div>
+
+            )}
+            {/* Campos adicionales para recepcionistas */}
+            {formData.rol === "recepcionista" && (
+              <div className="md:col-span-2 bg-gradient-to-br from-teal-50 to-teal-100 p-4 rounded-lg">
+                <h3 className="text-lg font-medium text-teal-700 mb-4 flex items-center">
+                  <Info className="h-5 w-5 mr-2" />
+                  Información Relevante
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label htmlFor="cedula" className="block text-sm font-medium text-gray-700 mb-1">
+                      Cédula <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <IdCard className="h-4 w-4 text-gray-400" />
+                      </div>
+                      <input
+                        type="text"
+                        id="cedula"
+                        name="cedula"
+                        value={formData.cedula}
+                        onChange={handleInputChange}
+                        className="pl-10 w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label htmlFor="direccion" className="block text-sm font-medium text-gray-700 mb-1">
+                      Dirección <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <MapPin className="h-4 w-4 text-gray-400" />
+                      </div>
+                      <input
+                        type="text"
+                        id="direccion"
+                        name="direccion"
+                        value={formData.direccion}
+                        onChange={handleInputChange}
+                        className="pl-10 w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        required
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
             )}
           </div>
 
@@ -276,7 +333,9 @@ const RegistrarEmpleadosView: React.FC = () => {
                   email: "",
                   password: "",
                   telefono: "",
-                  rol: "veterinario",
+                  rol: "recepcionista",
+                  cedula: "",
+                  direccion: "",
                   especialidad: "",
                   horario_atencion: "",
                 })

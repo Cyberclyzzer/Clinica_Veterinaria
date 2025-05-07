@@ -5,7 +5,7 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { Navigate } from "react-router-dom"
-import { Users, User, PawPrint, UserPlus, LogOut, Menu, X, LayoutDashboard, Shield, UserCog } from "lucide-react"
+import { Users, User, PawPrint, UserPlus, LogOut, Menu, X, LayoutDashboard, Shield, UserCog, Stethoscope, Monitor } from "lucide-react"
 
 import VeterinariosView from "./views/VeterinariosView"
 import RecepcionistasView from "./views/RecepcionistasView"
@@ -204,7 +204,7 @@ const AdminPage: React.FC = () => {
                     : "text-white hover:bg-indigo-500"
                 }`}
               >
-                <User className="h-5 w-5" />
+                <Stethoscope className="h-5 w-5" />
                 <span>Veterinarios</span>
               </button>
             </li>
@@ -220,7 +220,7 @@ const AdminPage: React.FC = () => {
                     : "text-white hover:bg-indigo-500"
                 }`}
               >
-                <User className="h-5 w-5" />
+                <Monitor className="h-5 w-5" />
                 <span>Recepcionistas</span>
               </button>
             </li>
