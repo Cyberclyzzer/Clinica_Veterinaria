@@ -38,6 +38,11 @@ function LoginPage() {
               sessionStorage.setItem('userData', data.usuario);
               navigate('/vet')
             }
+            if (data.usuario.rol_id === 3) {
+              sessionStorage.setItem('userId', data.usuario.id);
+              sessionStorage.setItem('userData', data.usuario);
+              navigate('/recepcionist')
+            }
             if (data.usuario.rol_id === 4) {
               sessionStorage.setItem('userId', data.usuario.id);
               sessionStorage.setItem('userData', data.usuario);
