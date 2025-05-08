@@ -253,14 +253,6 @@ function OwnerPetsView() {
               ? "No se encontraron mascotas con ese criterio de búsqueda."
               : "Agrega tu primera mascota para comenzar."}
           </p>
-          {!searchTerm && (
-            <button
-              onClick={() => setShowAddForm(true)}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              Agregar Mascota
-            </button>
-          )}
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
