@@ -186,14 +186,8 @@ function OwnerDashboardView({ setActiveView }: OwnerDashboardViewProps) {
           </div>
 
           {recentPets.length === 0 ? (
-            <div className="text-center py-6 text-gray-500">
+            <div className="text-center items-center py-6 text-gray-500">
               <p>No tienes mascotas registradas</p>
-              <button
-                onClick={() => setActiveView("pets")}
-                className="mt-2 text-blue-600 hover:text-blue-800 font-medium"
-              >
-                Registrar mascota
-              </button>
             </div>
           ) : (
             <ul className="space-y-3">
