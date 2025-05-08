@@ -24,13 +24,21 @@ const VetDashboardView: React.FC<VetDashboardViewProps> = ({ appointments, consu
   const [todayAppointments, setTodayAppointments] = useState<any[]>([])
   const [recentConsultations, setRecentConsultations] = useState<any[]>([])
   const [vetName, setVetName] = useState<string>("Dr. Veterinario")
+  const [vetId, setVetId] = useState<string>()
   const [stats, setStats] = useState<StatCard[]>([])
   const [loading, setLoading] = useState<boolean>(true)
 
   useEffect(() => {
     // Filter today's appointments
-    const today = new Date().toISOString().split("T")[0]
-    const todayAppts = appointments.filter((appt) => appt.fecha_hora.includes(today))
+    const today = new Date()
+    const todayAppts = appointments.filter((appt) => {
+      const apptDate = new Date(appt.fecha_hora)
+      return (
+        apptDate.getDate() === today.getDate() &&
+        apptDate.getMonth() === today.getMonth() &&
+        apptDate.getFullYear() === today.getFullYear()
+      )
+    })
     setTodayAppointments(todayAppts)
 
     // Get recent consultations
@@ -40,17 +48,19 @@ const VetDashboardView: React.FC<VetDashboardViewProps> = ({ appointments, consu
     setRecentConsultations(sortedConsultations.slice(0, 3))
 
     // Calculate stats
-    const uniquePatients = new Set(appointments.map((appt) => appt.mascota_nombre))
-    const uniqueOwners = new Set(appointments.map((appt) => appt.propietario_nombre))
+    const uniquePatients = new Set(appointments.map((appt) => appt.mascota))
+    const uniqueOwners = new Set(appointments.map((appt) => appt.propietario))
+    
 
     const fetchName = async () => {
         try {
-            const vetResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/veterinarios/${userId}`)
+            const vetResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/veterinarios/usuario/${userId}`)
             if (vetResponse.ok) {
               const vetData = await vetResponse.json()
-              console.log("Vet Data:", vetData)
-              if (vetData && vetData.nombre) {
+              
+              if (vetData && vetData.nombre && vetData.id) {
                 setVetName(vetData.nombre)
+                setVetId(vetData.id)
               }
             }
           } catch (error) {
@@ -178,8 +188,8 @@ const VetDashboardView: React.FC<VetDashboardViewProps> = ({ appointments, consu
                         <PawPrint className="h-5 w-5" />
                       </div>
                       <div>
-                        <p className="font-medium text-gray-800">{appt.mascota_nombre}</p>
-                        <p className="text-sm text-gray-500">{appt.propietario_nombre}</p>
+                        <p className="font-medium text-gray-800">{appt.mascota}</p>
+                        <p className="text-sm text-gray-500">{appt.propietario}</p>
                         <div className="flex items-center mt-1 text-xs text-gray-500">
                           <Clock className="h-3 w-3 mr-1" />
                           {new Date(appt.fecha_hora).toLocaleTimeString("es-ES", {
@@ -213,10 +223,10 @@ const VetDashboardView: React.FC<VetDashboardViewProps> = ({ appointments, consu
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center text-sm font-medium text-gray-700">
-                  <div className="h-2 w-2 rounded-full bg-green-500 mr-2"></div>
+                  <div className="h-2 w-2 rounded-full bg-amber-500 mr-2"></div>
                   Consultas
                 </div>
-                <span className="text-sm font-medium text-green-600">{consultations.length}</span>
+                <span className="text-sm font-medium text-amber-600">{consultations.length}</span>
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center text-sm font-medium text-gray-700">
@@ -227,10 +237,10 @@ const VetDashboardView: React.FC<VetDashboardViewProps> = ({ appointments, consu
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center text-sm font-medium text-gray-700">
-                  <div className="h-2 w-2 rounded-full bg-amber-500 mr-2"></div>
+                  <div className="h-2 w-2 rounded-full bg-green-500 mr-2"></div>
                   Citas de Hoy
                 </div>
-                <span className="text-sm font-medium text-amber-600">{todayAppointments.length}</span>
+                <span className="text-sm font-medium text-green-600">{todayAppointments.length}</span>
               </div>
             </div>
 
@@ -243,7 +253,7 @@ const VetDashboardView: React.FC<VetDashboardViewProps> = ({ appointments, consu
                   {recentConsultations.map((consult) => (
                     <div key={consult.id} className="bg-gray-50 rounded-lg p-3">
                       <div className="flex items-center justify-between mb-1">
-                        <p className="font-medium text-sm">{consult.mascota_nombre}</p>
+                        <p className="font-medium text-sm">{consult.mascota}</p>
                         <span className="text-xs text-gray-500">{formatDate(consult.fecha)}</span>
                       </div>
                       <p className="text-xs text-gray-600 line-clamp-1">{consult.descripcion}</p>

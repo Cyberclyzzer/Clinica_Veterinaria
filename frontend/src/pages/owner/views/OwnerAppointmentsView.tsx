@@ -161,22 +161,6 @@ function OwnerAppointmentsView() {
     <div>
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
         <h1 className="text-3xl font-bold text-blue-700 mb-4 md:mb-0">Citas</h1>
-        <button
-          onClick={() => setShowForm(!showForm)}
-          className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center transition-colors"
-        >
-          {showForm ? (
-            <>
-              <X className="h-5 w-5 mr-2" />
-              Cancelar
-            </>
-          ) : (
-            <>
-              <Calendar className="h-5 w-5 mr-2" />
-              Agendar Cita
-            </>
-          )}
-        </button>
       </div>
 
       {/* Appointment Form */}

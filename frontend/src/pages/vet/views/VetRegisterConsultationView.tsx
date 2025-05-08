@@ -12,8 +12,8 @@ interface MedicalRecord {
 
 interface Appointment {
   id: number
-  mascota_nombre: string
-  propietario_nombre: string
+  mascota: string
+  propietario: string
   fecha_hora: string
   motivo: string
 }
@@ -66,7 +66,7 @@ const VetRegisterConsultationView: React.FC<VetRegisterConsultationViewProps> = 
                     <option value="">Seleccionar paciente</option>
                     {appointments.map((appt) => (
                       <option key={appt.id} value={appt.id}>
-                        {appt.mascota_nombre} - {appt.propietario_nombre}
+                        {appt.mascota} - {appt.propietario}
                       </option>
                     ))}
                   </select>
@@ -158,10 +158,10 @@ const VetRegisterConsultationView: React.FC<VetRegisterConsultationViewProps> = 
                     >
                       <div className="flex items-center mb-1">
                         <PawPrint className="h-4 w-4 text-green-600 mr-2" />
-                        <span className="font-medium">{appt.mascota_nombre}</span>
+                        <span className="font-medium">{appt.mascota}</span>
                       </div>
                       <div className="text-sm text-gray-500 ml-6">
-                        <p>{appt.propietario_nombre}</p>
+                        <p>{appt.propietario}</p>
                         <p className="flex items-center">
                           <Calendar className="h-3 w-3 mr-1" />
                           {new Date(appt.fecha_hora).toLocaleDateString()}

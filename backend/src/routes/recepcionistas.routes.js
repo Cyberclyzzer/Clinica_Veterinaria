@@ -9,4 +9,6 @@ router.get('/:id', recepcionistasController.obtenerRecepcionista);
 
 router.post('/', postValidator, recepcionistasController.crearRecepcionista);
 
+router.get('/usuario/:usuario_id', recepcionistasController.ObtenerPorIdUsuario);
+
 module.exports = router;

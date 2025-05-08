@@ -6,7 +6,7 @@ import { useState } from "react"
 
 interface Consultation {
   id: number
-  mascota_nombre: string
+  mascota: string
   descripcion: string
   tratamiento: string
   fecha: string
@@ -32,7 +32,7 @@ const VetConsultationsView: React.FC<VetConsultationsViewProps> = ({ consultatio
   // Filter consultations based on search term and date
   const filteredConsultations = consultations.filter((consultation) => {
     const matchesSearch =
-      consultation.mascota_nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      consultation.mascota.toLowerCase().includes(searchTerm.toLowerCase()) ||
       consultation.descripcion.toLowerCase().includes(searchTerm.toLowerCase()) ||
       consultation.tratamiento.toLowerCase().includes(searchTerm.toLowerCase())
 
@@ -91,7 +91,7 @@ const VetConsultationsView: React.FC<VetConsultationsViewProps> = ({ consultatio
           <div>
             <p className="text-sm text-blue-700 font-medium">Pacientes Atendidos</p>
             <p className="text-2xl font-bold text-blue-900">
-              {new Set(consultations.map((c) => c.mascota_nombre)).size}
+              {new Set(consultations.map((c) => c.mascota)).size}
             </p>
           </div>
         </div>
@@ -137,7 +137,7 @@ const VetConsultationsView: React.FC<VetConsultationsViewProps> = ({ consultatio
                   <div className="mb-4 md:mb-0">
                     <div className="flex items-center mb-2">
                       <PawPrint className="h-5 w-5 text-green-600 mr-2" />
-                      <span className="text-lg font-semibold text-green-700">{consultation.mascota_nombre}</span>
+                      <span className="text-lg font-semibold text-green-700">{consultation.mascota}</span>
                       <span className="ml-2 text-sm bg-green-100 text-green-700 rounded-full px-2 py-0.5">
                         {formatDate(consultation.fecha)}
                       </span>

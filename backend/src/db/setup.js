@@ -65,6 +65,7 @@ CREATE TABLE IF NOT EXISTS citas (
   mascota_id INTEGER REFERENCES mascotas(id) ON DELETE CASCADE,
   veterinario_id INTEGER REFERENCES veterinarios(id) ON DELETE CASCADE,
   fecha_hora TIMESTAMP WITH TIME ZONE NOT NULL,
+  duracion_estimada INTEGER NOT NULL,
   motivo TEXT,
   notas_veterinario TEXT
 );

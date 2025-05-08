@@ -35,7 +35,10 @@ function OwnerDashboardView({ setActiveView }: OwnerDashboardViewProps) {
 
       try {
         // Fetch pets
-        const petsResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/mascotas/propietario/${userId}`)
+        const propietarioResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/propietarios/${userId}`)
+        const propietarioData = await propietarioResponse.json()
+
+        const petsResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/mascotas/propietario/${propietarioData.id}`)
         const petsData = await petsResponse.json()
 
         if (Array.isArray(petsData)) {

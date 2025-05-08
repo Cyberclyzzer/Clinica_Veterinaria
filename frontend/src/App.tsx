@@ -7,6 +7,7 @@ import RegisterPage from './pages/RegisterPage';
 import OwnerPage from './pages/owner/OwnerPage';
 import AdminPage from './pages/admin/AdminPage';
 import VetPage from './pages/vet/VetPage';
+import RecepcionistPage from './pages/recepcionist/RecepcionistPage';
 
 function App() {
 
@@ -18,6 +19,8 @@ function App() {
 
 
       <Route path="/owner" element={<OwnerPage />} />
+
+      <Route path="/recepcionist" element={<RecepcionistPage />} />
 
       <Route path="/vet" element={<VetPage/>} />
 

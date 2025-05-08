@@ -14,6 +14,7 @@ interface Pet {
 }
 
 function OwnerPetsView() {
+  const [propietarioId, setPropietarioId] = useState<string>("")
   const [pets, setPets] = useState<Pet[]>([])
   const [loading, setLoading] = useState<boolean>(true)
   const [showAddForm, setShowAddForm] = useState<boolean>(false)
@@ -29,7 +30,11 @@ function OwnerPetsView() {
   useEffect(() => {
     const fetchPets = async () => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/mascotas/propietario/${userId}`)
+        const propietarioResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/propietarios/${userId}`)
+        const propietarioData = await propietarioResponse.json()
+        setPropietarioId(propietarioData.id)
+
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/mascotas/propietario/${propietarioData.id}`)
         const data = await response.json()
         setPets(data)
       } catch (error) {
@@ -63,7 +68,7 @@ function OwnerPetsView() {
         },
         body: JSON.stringify({
           ...newPet,
-          propietario_id: userId,
+          propietario_id: propietarioId,
         }),
       })
 
@@ -103,9 +108,9 @@ function OwnerPetsView() {
 
   const getSpeciesIcon = (species: string) => {
     switch (species.toLowerCase()) {
-      case "perro":
+      case "canino":
         return "🐕"
-      case "gato":
+      case "felino":
         return "🐈"
       case "ave":
         return "🦜"
@@ -130,22 +135,6 @@ function OwnerPetsView() {
     <div>
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
         <h1 className="text-3xl font-bold text-blue-700 mb-4 md:mb-0">Mis Mascotas</h1>
-        <button
-          onClick={() => setShowAddForm(!showAddForm)}
-          className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center transition-colors"
-        >
-          {showAddForm ? (
-            <>
-              <X className="h-5 w-5 mr-2" />
-              Cancelar
-            </>
-          ) : (
-            <>
-              <Plus className="h-5 w-5 mr-2" />
-              Agregar Mascota
-            </>
-          )}
-        </button>
       </div>
 
       {/* Search Bar */}

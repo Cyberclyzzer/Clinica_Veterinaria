@@ -3,8 +3,8 @@ import { Calendar, Clock, PawPrint, User, FileText, CheckCircle } from "lucide-r
 
 interface Appointment {
   id: number
-  mascota_nombre: string
-  propietario_nombre: string
+  mascota: string
+  propietario: string
   fecha_hora: string
   motivo: string
 }
@@ -96,7 +96,7 @@ const VetAppointmentsView: React.FC<VetAppointmentsViewProps> = ({ appointments 
           <div>
             <p className="text-sm text-green-700 font-medium">Pacientes</p>
             <p className="text-2xl font-bold text-green-900">
-              {new Set(appointments.map((app) => app.mascota_nombre)).size}
+              {new Set(appointments.map((app) => app.mascota)).size}
             </p>
           </div>
         </div>
@@ -139,11 +139,11 @@ const VetAppointmentsView: React.FC<VetAppointmentsViewProps> = ({ appointments 
                         <div className="space-y-1 text-gray-600">
                           <p className="flex items-center">
                             <PawPrint className="h-4 w-4 text-green-600 mr-2" />
-                            <span className="font-medium">{appointment.mascota_nombre}</span>
+                            <span className="font-medium">{appointment.mascota}</span>
                           </p>
                           <p className="flex items-center">
                             <User className="h-4 w-4 text-blue-600 mr-2" />
-                            <span>Propietario: {appointment.propietario_nombre}</span>
+                            <span>Propietario: {appointment.propietario}</span>
                           </p>
                           <p className="flex items-start">
                             <FileText className="h-4 w-4 text-green-600 mr-2 mt-1" />
