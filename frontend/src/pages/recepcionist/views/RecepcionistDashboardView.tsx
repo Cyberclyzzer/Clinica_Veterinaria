@@ -53,6 +53,7 @@ const RecepcionistDashboardView: React.FC<RecepcionistDashboardViewProps> = ({ s
           // Filter today's appointments
           const today = new Date().toISOString().split("T")[0]
           const todayAppts = appointmentsData.filter((appt) => appt.fecha_hora.includes(today))
+
           setTodayAppointments(todayAppts)
         }
 
@@ -186,8 +187,8 @@ const RecepcionistDashboardView: React.FC<RecepcionistDashboardViewProps> = ({ s
                         <PawPrint className="h-5 w-5" />
                       </div>
                       <div>
-                        <p className="font-medium text-gray-800">{appt.mascota_nombre}</p>
-                        <p className="text-sm text-gray-500">{appt.propietario_nombre}</p>
+                        <p className="font-medium text-gray-800">{appt.mascota}</p>
+                        <p className="text-sm text-gray-500">{appt.propietario}</p>
                         <div className="flex items-center mt-1 text-xs text-gray-500">
                           <Clock className="h-3 w-3 mr-1" />
                           {new Date(appt.fecha_hora).toLocaleTimeString("es-ES", {
@@ -200,7 +201,7 @@ const RecepcionistDashboardView: React.FC<RecepcionistDashboardViewProps> = ({ s
                       </div>
                     </div>
                     <div className="text-sm text-gray-500">
-                      <p>Dr. {appt.veterinario_nombre}</p>
+                      <p>Dr. {appt.veterinario}</p>
                     </div>
                   </div>
                 ))}

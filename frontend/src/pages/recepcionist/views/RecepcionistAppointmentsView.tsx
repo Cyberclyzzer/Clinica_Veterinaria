@@ -7,76 +7,94 @@ import { Calendar, Search, Filter, Clock, PawPrint, User, Stethoscope, CheckCirc
 
 interface Appointment {
   id: number
-  mascota_nombre: string
-  propietario_nombre: string
-  veterinario_nombre: string
+  id_cita?: number // Para compatibilidad con diferentes formatos de respuesta
+  mascota_nombre?: string
+  mascota?: string
+  propietario_nombre?: string
+  propietario?: string
+  veterinario_nombre?: string
+  veterinario?: string
   fecha_hora: string
   motivo: string
   estado?: string
+  duracion_estimada?: number
 }
 
 const RecepcionistAppointmentsView: React.FC = () => {
+  // Obtener la fecha actual en formato YYYY-MM-DD para el filtro por defecto
+  const today = new Date().toISOString().split("T")[0]
+
   const [appointments, setAppointments] = useState<Appointment[]>([])
   const [filteredAppointments, setFilteredAppointments] = useState<Appointment[]>([])
   const [searchTerm, setSearchTerm] = useState<string>("")
-  const [dateFilter, setDateFilter] = useState<string>("")
+  const [dateFilter, setDateFilter] = useState<string>(today) // Inicializar con la fecha actual
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [loading, setLoading] = useState<boolean>(true)
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null)
   const [showDetails, setShowDetails] = useState<boolean>(false)
 
   useEffect(() => {
-    const fetchAppointments = async () => {
-      try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/citas`)
-        const data = await response.json()
+    fetchAppointmentsByDate(dateFilter)
+  }, [dateFilter]) // Cargar citas cuando cambie la fecha
 
-        // Add a status field to each appointment (this would normally come from the API)
-        const appointmentsWithStatus = data.map((appt: Appointment) => {
-          const appointmentDate = new Date(appt.fecha_hora)
-          const now = new Date()
+  const fetchAppointmentsByDate = async (date: string) => {
+    setLoading(true)
+    try {
+      // Usar el endpoint específico para obtener citas por fecha
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/citas/fecha/${date}`)
+      const data = await response.json()
 
-          let status = "pendiente"
-          if (appointmentDate < now) {
-            status = "completada"
-          }
+      // Normalizar los datos para manejar diferentes formatos de respuesta
+      const normalizedAppointments = data.map((appt: any) => {
+        const appointmentDate = new Date(appt.fecha_hora)
+        const now = new Date()
 
-          return { ...appt, estado: status }
-        })
+        let status = "pendiente"
+        if (appointmentDate < now) {
+          status = "completada"
+        }
 
-        setAppointments(appointmentsWithStatus)
-        setFilteredAppointments(appointmentsWithStatus)
-        setLoading(false)
-      } catch (error) {
-        console.error("Error fetching appointments:", error)
-        setLoading(false)
-      }
+        // Normalizar los nombres de las propiedades
+        return {
+          id: appt.id || appt.id_cita,
+          id_cita: appt.id_cita || appt.id,
+          mascota_nombre: appt.mascota_nombre || appt.mascota,
+          propietario_nombre: appt.propietario_nombre || appt.propietario,
+          veterinario_nombre: appt.veterinario_nombre || appt.veterinario,
+          fecha_hora: appt.fecha_hora,
+          motivo: appt.motivo,
+          estado: status,
+          duracion_estimada: appt.duracion_estimada || 1,
+        }
+      })
+
+      setAppointments(normalizedAppointments)
+      applyFilters(normalizedAppointments)
+      setLoading(false)
+    } catch (error) {
+      console.error("Error fetching appointments by date:", error)
+      setAppointments([])
+      setFilteredAppointments([])
+      setLoading(false)
     }
-
-    fetchAppointments()
-  }, [])
+  }
 
   useEffect(() => {
-    filterAppointments()
-  }, [searchTerm, dateFilter, statusFilter, appointments])
+    applyFilters(appointments)
+  }, [searchTerm, statusFilter])
 
-  const filterAppointments = () => {
-    let filtered = [...appointments]
+  const applyFilters = (appts: Appointment[]) => {
+    let filtered = [...appts]
 
     // Filter by search term
     if (searchTerm) {
       filtered = filtered.filter(
         (appt) =>
-          appt.mascota_nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          appt.propietario_nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          appt.veterinario_nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          appt.motivo.toLowerCase().includes(searchTerm.toLowerCase()),
+          (appt.mascota_nombre?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
+          (appt.propietario_nombre?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
+          (appt.veterinario_nombre?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
+          (appt.motivo?.toLowerCase() || "").includes(searchTerm.toLowerCase()),
       )
-    }
-
-    // Filter by date
-    if (dateFilter) {
-      filtered = filtered.filter((appt) => appt.fecha_hora.includes(dateFilter))
     }
 
     // Filter by status
@@ -100,7 +118,16 @@ const RecepcionistAppointmentsView: React.FC = () => {
   }
 
   const openAppointmentDetails = (appointment: Appointment) => {
-    setSelectedAppointment(appointment)
+    // Asegurarse de que todos los campos necesarios estén presentes
+    const completeAppointment = {
+      ...appointment,
+      id: appointment.id || appointment.id_cita || 0,
+      mascota_nombre: appointment.mascota_nombre || appointment.mascota || "No disponible",
+      propietario_nombre: appointment.propietario_nombre || appointment.propietario || "No disponible",
+      veterinario_nombre: appointment.veterinario_nombre || appointment.veterinario || "No disponible",
+    }
+
+    setSelectedAppointment(completeAppointment)
     setShowDetails(true)
   }
 
@@ -145,6 +172,22 @@ const RecepcionistAppointmentsView: React.FC = () => {
     }
   }
 
+  // Formatear la fecha para mostrarla en el título
+  const formatDisplayDate = (dateString: string) => {
+    const date = new Date(dateString)
+    return new Intl.DateTimeFormat("es-ES", {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+    }).format(date)
+  }
+
+  // Verificar si la fecha seleccionada es hoy
+  const isToday = (dateString: string) => {
+    const today = new Date().toISOString().split("T")[0]
+    return dateString === today
+  }
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -156,8 +199,10 @@ const RecepcionistAppointmentsView: React.FC = () => {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold text-pink-700">Citas</h1>
-        <div className="text-sm text-gray-500">Total: {appointments.length} citas</div>
+        <h1 className="text-3xl font-bold text-pink-700">
+          Citas {isToday(dateFilter) ? "de Hoy" : `del ${formatDisplayDate(dateFilter)}`}
+        </h1>
+        <div className="text-sm text-gray-500">Total: {filteredAppointments.length} citas</div>
       </div>
 
       {/* Search and Filters */}
@@ -208,9 +253,9 @@ const RecepcionistAppointmentsView: React.FC = () => {
           <Calendar className="h-12 w-12 mx-auto text-gray-400 mb-4" />
           <h3 className="text-xl font-medium text-gray-700 mb-2">No se encontraron citas</h3>
           <p className="text-gray-500">
-            {searchTerm || dateFilter || statusFilter !== "all"
+            {searchTerm || statusFilter !== "all"
               ? "No hay citas que coincidan con los criterios de búsqueda."
-              : "No hay citas registradas en el sistema."}
+              : `No hay citas programadas para el ${formatDisplayDate(dateFilter)}.`}
           </p>
         </div>
       ) : (
@@ -220,7 +265,7 @@ const RecepcionistAppointmentsView: React.FC = () => {
               <thead className="bg-gradient-to-r from-pink-600 to-purple-600 text-white">
                 <tr>
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-                    Fecha y Hora
+                    Hora
                   </th>
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                     Mascota
@@ -245,7 +290,12 @@ const RecepcionistAppointmentsView: React.FC = () => {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <Clock className="h-5 w-5 text-pink-600 mr-2" />
-                        <span>{formatDate(appointment.fecha_hora)}</span>
+                        <span>
+                          {new Date(appointment.fecha_hora).toLocaleTimeString("es-ES", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </span>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">

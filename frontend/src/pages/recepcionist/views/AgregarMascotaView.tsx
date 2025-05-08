@@ -266,11 +266,12 @@ const AgregarMascotaView: React.FC = () => {
                     required
                   >
                     <option value="">Seleccionar especie</option>
-                    <option value="Perro">Perro</option>
-                    <option value="Gato">Gato</option>
-                    <option value="Ave">Ave</option>
-                    <option value="Conejo">Conejo</option>
-                    <option value="Pez">Pez</option>
+                    <option value="Canino">Canino</option>
+                    <option value="Felino">Felino</option>
+                    <option value="Equino">Equino</option>
+                    <option value="Bovino">Bovino</option>
+                    <option value="Porcino">Porcino</option>
+                    <option value="Caprino">Caprino</option>
                     <option value="Otro">Otro</option>
                   </select>
                 </div>

@@ -2,13 +2,13 @@ const pool = require('../db/index');
 
 // Crear nueva cita
 exports.crearCita = async (req, res) => {
-  const { mascota_id, veterinario_id, fecha_hora, motivo, notas_veterinario } = req.body;
+  const { mascota_id, veterinario_id, fecha_hora, duracion_estimada, motivo, notas_veterinario } = req.body;
   try {
     const result = await pool.query(`
-      INSERT INTO citas (mascota_id, veterinario_id, fecha_hora, motivo, notas_veterinario)
-      VALUES ($1, $2, $3, $4, $5)
+      INSERT INTO citas (mascota_id, veterinario_id, fecha_hora, duracion_estimada, motivo, notas_veterinario)
+      VALUES ($1, $2, $3, $4, $5, $6)
       RETURNING *
-    `, [mascota_id, veterinario_id, fecha_hora, motivo, notas_veterinario]);
+    `, [mascota_id, veterinario_id, fecha_hora, duracion_estimada, motivo, notas_veterinario]);
     res.status(201).json(result.rows[0]);
   } catch (error) {
     console.error(error);

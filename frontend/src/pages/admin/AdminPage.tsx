@@ -5,18 +5,17 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { Navigate } from "react-router-dom"
-import { Users, User, PawPrint, UserPlus, LogOut, Menu, X, LayoutDashboard, Shield, UserCog, Stethoscope, Monitor } from "lucide-react"
+import { Users, UserPlus, LogOut, Menu, X, LayoutDashboard, Shield, UserCog, Stethoscope, Monitor } from "lucide-react"
 
 import VeterinariosView from "./views/VeterinariosView"
 import RecepcionistasView from "./views/RecepcionistasView"
 import PropietariosView from "./views/PropietariosView"
-import MascotasView from "./views/MascotasView"
 import RegistrarEmpleadosView from "./views/RegistrarEmpleadosView"
 import AdminDashboardView from "./views/AdminDashboardView"
 
 const AdminPage: React.FC = () => {
   const [activeView, setActiveView] = useState<
-    "dashboard" | "veterinarios" | "recepcionistas" | "propietarios" | "mascotas" | "registrar"
+    "dashboard" | "veterinarios" | "recepcionistas" | "propietarios" | "registrar"
   >("dashboard")
   const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null)
   const [adminName, setAdminName] = useState<string>("Administrador")
@@ -24,7 +23,6 @@ const AdminPage: React.FC = () => {
   const [vetCount, setVetCount] = useState<number>(0)
   const [receptionistCount, setReceptionistCount] = useState<number>(0)
   const [ownerCount, setOwnerCount] = useState<number>(0)
-  const [petCount, setPetCount] = useState<number>(0)
 
   const userId = sessionStorage.getItem("userId")
   const navigate = useNavigate()
@@ -49,7 +47,7 @@ const AdminPage: React.FC = () => {
           setIsAuthorized(true)
 
           // Try to get admin name
-          try {
+          /*try {
             const adminResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/administradores/usuario/${userId}`)
             if (adminResponse.ok) {
               const adminData = await adminResponse.json()
@@ -59,7 +57,7 @@ const AdminPage: React.FC = () => {
             }
           } catch (error) {
             console.error("Error fetching admin data:", error)
-          }
+          }*/
         } else {
           setIsAuthorized(false)
         }
@@ -97,13 +95,6 @@ const AdminPage: React.FC = () => {
         const ownersData = await ownersResponse.json()
         if (Array.isArray(ownersData)) {
           setOwnerCount(ownersData.length)
-        }
-
-        // Fetch pets count
-        const petsResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/mascotas-crud`)
-        const petsData = await petsResponse.json()
-        if (Array.isArray(petsData)) {
-          setPetCount(petsData.length)
         }
       } catch (error) {
         console.error("Error fetching counts:", error)
@@ -243,22 +234,6 @@ const AdminPage: React.FC = () => {
             <li>
               <button
                 onClick={() => {
-                  setActiveView("mascotas")
-                  setMobileMenuOpen(false)
-                }}
-                className={`w-full text-left px-4 py-3 rounded-lg flex items-center space-x-3 transition-colors ${
-                  activeView === "mascotas"
-                    ? "bg-white text-indigo-700 font-medium shadow-md"
-                    : "text-white hover:bg-indigo-500"
-                }`}
-              >
-                <PawPrint className="h-5 w-5" />
-                <span>Mascotas</span>
-              </button>
-            </li>
-            <li>
-              <button
-                onClick={() => {
                   setActiveView("registrar")
                   setMobileMenuOpen(false)
                 }}
@@ -295,14 +270,12 @@ const AdminPage: React.FC = () => {
               vetCount={vetCount}
               receptionistCount={receptionistCount}
               ownerCount={ownerCount}
-              petCount={petCount}
               setActiveView={setActiveView}
             />
           )}
           {activeView === "veterinarios" && <VeterinariosView />}
           {activeView === "recepcionistas" && <RecepcionistasView />}
           {activeView === "propietarios" && <PropietariosView />}
-          {activeView === "mascotas" && <MascotasView />}
           {activeView === "registrar" && <RegistrarEmpleadosView />}
         </div>
       </main>

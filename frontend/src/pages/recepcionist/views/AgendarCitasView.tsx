@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useState, useEffect, useMemo } from "react"
 import {
-  Calendar,
+  CalendarIcon,
   Clock,
   PawPrint,
   Stethoscope,
@@ -14,7 +14,10 @@ import {
   AlertCircle,
   Search,
   X,
+  Info,
 } from "lucide-react"
+import TimeSlotGrid from "../../../components/TimeSlotGrid"
+import CalendarPicker from "../../../components/CalendarPicker"
 
 interface Owner {
   id: number
@@ -37,6 +40,25 @@ interface Vet {
   especialidad: string
 }
 
+interface Appointment {
+  id: number
+  mascota_id: number
+  veterinario_id: number
+  fecha_hora: string
+  duracion_estimada: number
+  motivo: string
+  mascota?: {
+    id: number
+    nombre: string
+    especie: string
+  } | null
+  veterinario?: {
+    id: number
+    nombre: string
+    especialidad: string
+  } | null
+}
+
 const AgendarCitasView: React.FC = () => {
   const [owners, setOwners] = useState<Owner[]>([])
   const [pets, setPets] = useState<Pet[]>([])
@@ -51,12 +73,24 @@ const AgendarCitasView: React.FC = () => {
   const [showOwnerSearch, setShowOwnerSearch] = useState<boolean>(false)
   const [selectedOwner, setSelectedOwner] = useState<Owner | null>(null)
 
+  // Estado para el calendario
+  const [selectedDate, setSelectedDate] = useState<Date>(() => {
+    const now = new Date()
+    return new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  })
+  const [showCalendarPicker, setShowCalendarPicker] = useState<boolean>(false)
+  const [dateAppointments, setDateAppointments] = useState<Appointment[]>([])
+  const [vetAppointments, setVetAppointments] = useState<Appointment[]>([])
+  const [selectedTimeSlot, setSelectedTimeSlot] = useState<string | null>(null)
+  const [selectedDuration, setSelectedDuration] = useState<number>(1)
+  const [showCalendar, setShowCalendar] = useState<boolean>(false)
+  const [loadingAppointments, setLoadingAppointments] = useState<boolean>(false)
+
+  // Estado del formulario
   const [appointment, setAppointment] = useState({
     propietario_id: "",
     mascota_id: "",
     veterinario_id: "",
-    date: "",
-    time: "",
     motivo: "",
   })
 
@@ -98,6 +132,177 @@ const AgendarCitasView: React.FC = () => {
     }
   }, [appointment.propietario_id, pets])
 
+  // Filtrar citas por fecha seleccionada
+  useEffect(() => {
+    const fetchAppointmentsByDate = async () => {
+      if (!selectedDate) return
+
+      try {
+        setLoadingAppointments(true)
+        const dateString = selectedDate.toISOString().split("T")[0]
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/citas/fecha/${dateString}`)
+
+        if (response.ok) {
+          const data = await response.json()
+
+          // Obtener detalles completos de cada cita
+          const appointmentsWithDetails = await Promise.all(
+            data.map(async (app: Appointment) => {
+              try {
+                let mascotaData = null
+                let vetData = null
+
+                // Solo obtener detalles si los IDs son válidos
+                if (app.mascota_id) {
+                  // Obtener detalles de la mascota
+                  const mascotaResponse = await fetch(
+                    `${import.meta.env.VITE_API_URL}/api/mascotas-crud/${app.mascota_id}`,
+                  )
+                  if (mascotaResponse.ok) {
+                    mascotaData = await mascotaResponse.json()
+                  }
+                }
+
+                if (app.veterinario_id) {
+                  // Obtener detalles del veterinario
+                  const vetResponse = await fetch(
+                    `${import.meta.env.VITE_API_URL}/api/veterinarios/${app.veterinario_id}`,
+                  )
+                  if (vetResponse.ok) {
+                    vetData = await vetResponse.json()
+                  }
+                }
+
+                return {
+                  ...app,
+                  mascota: mascotaData,
+                  veterinario: vetData,
+                }
+              } catch (error) {
+                console.error("Error fetching appointment details:", error)
+                return {
+                  ...app,
+                  mascota: null,
+                  veterinario: null,
+                }
+              }
+            }),
+          )
+
+          console.log("Appointments with details:", appointmentsWithDetails)
+          setDateAppointments(appointmentsWithDetails)
+        } else {
+          if (response.status !== 404) {
+            console.error("Error fetching appointments by date:", response.statusText)
+          }
+          setDateAppointments([])
+        }
+        setLoadingAppointments(false)
+      } catch (error) {
+        console.error("Error fetching appointments by date:", error)
+        setDateAppointments([])
+        setLoadingAppointments(false)
+      }
+    }
+
+    fetchAppointmentsByDate()
+  }, [selectedDate])
+
+  // Actualizar citas del veterinario cuando cambia el veterinario o la fecha
+  useEffect(() => {
+    console.log("fetchVetAppointments useEffect triggered with veterinarian_id:", appointment.veterinario_id)
+    const fetchVetAppointments = async () => {
+      // Validate veterinarian ID before fetching
+      if (!appointment.veterinario_id) {
+        console.warn("Veterinario ID is empty or undefined, skipping fetchVetAppointments")
+        return
+      }
+      if (!selectedDate) {
+        console.warn("Selected date is undefined, skipping fetchVetAppointments")
+        return
+      }
+
+      const vetIdNum = Number(appointment.veterinario_id)
+      if (isNaN(vetIdNum)) {
+        console.warn(`Veterinario ID is not a valid number: ${appointment.veterinario_id}`)
+        return
+      }
+
+      try {
+        setLoadingAppointments(true)
+        const dateString = selectedDate.toISOString().split("T")[0]
+        console.log(`Fetching vet appointments for vet ID: ${vetIdNum} on date: ${dateString}`)
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/citas/veterinario/${vetIdNum}/fecha/${dateString}`,
+        )
+
+        if (response.ok) {
+          const data = await response.json()
+
+          // Obtener detalles completos de cada cita
+          const appointmentsWithDetails = await Promise.all(
+            data.map(async (app: Appointment) => {
+              try {
+                let mascotaData = null
+
+                // Solo obtener detalles si el ID de mascota es válido
+                if (app.mascota_id) {
+                  // Obtener detalles de la mascota
+                  const mascotaResponse = await fetch(
+                    `${import.meta.env.VITE_API_URL}/api/mascotas-crud/${app.mascota_id}`,
+                  )
+                  if (mascotaResponse.ok) {
+                    mascotaData = await mascotaResponse.json()
+                  }
+                }
+
+                // El veterinario ya lo conocemos
+                const vetData = vets.find((v) => v.id === Number(app.veterinario_id)) || null
+
+                return {
+                  ...app,
+                  mascota: mascotaData,
+                  veterinario: vetData,
+                }
+              } catch (error) {
+                console.error("Error fetching appointment details:", error)
+                return {
+                  ...app,
+                  mascota: null,
+                  veterinario: null,
+                }
+              }
+            }),
+          )
+
+          console.log("Vet appointments with details:", appointmentsWithDetails)
+          setVetAppointments(appointmentsWithDetails)
+        } else {
+          if (response.status !== 404) {
+            console.error("Error fetching vet appointments:", response.statusText)
+          }
+          setVetAppointments([])
+        }
+        setLoadingAppointments(false)
+      } catch (error) {
+        console.error("Error fetching vet appointments:", error)
+        setVetAppointments([])
+        setLoadingAppointments(false)
+      }
+    }
+
+    if (appointment.veterinario_id) {
+      fetchVetAppointments()
+      setShowCalendar(true)
+    } else {
+      setShowCalendar(false)
+      setVetAppointments([])
+    }
+
+    // Resetear el time slot seleccionado cuando cambia el veterinario
+    setSelectedTimeSlot(null)
+  }, [appointment.veterinario_id, selectedDate, vets])
+
   // Filtrar propietarios basados en la búsqueda
   const filteredOwners = useMemo(() => {
     if (!searchQuery.trim()) return owners
@@ -114,12 +319,47 @@ const AgendarCitasView: React.FC = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
+    console.log(`handleChange called with name: ${name}, value: ${value}`)
     setAppointment((prev) => ({ ...prev, [name]: value }))
 
     // Reset pet selection when owner changes
     if (name === "propietario_id") {
       setAppointment((prev) => ({ ...prev, mascota_id: "" }))
     }
+
+    // Reset time slot when veterinarian changes
+    if (name === "veterinario_id") {
+      setSelectedTimeSlot(null)
+    }
+  }
+
+  const handleDurationChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedDuration(Number(e.target.value))
+    // Reset time slot when duration changes
+    setSelectedTimeSlot(null)
+  }
+
+  // Función para seleccionar una fecha del calendario
+  const handleDateSelect = (date: Date) => {
+    // No permitir fechas anteriores a hoy
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+
+    // Crear una nueva instancia de Date para evitar problemas de referencia
+    const selectedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate())
+
+    if (selectedDate >= today) {
+      setSelectedDate(selectedDate)
+      setSelectedTimeSlot(null)
+      setShowCalendarPicker(false)
+    }
+  }
+
+  // Función para seleccionar un bloque de tiempo
+  const handleTimeSlotSelect = (hour: number, minute: number) => {
+    const formattedHour = hour.toString().padStart(2, "0")
+    const formattedMinute = minute.toString().padStart(2, "0")
+    setSelectedTimeSlot(`${formattedHour}:${formattedMinute}`)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -130,16 +370,28 @@ const AgendarCitasView: React.FC = () => {
     if (
       !appointment.mascota_id ||
       !appointment.veterinario_id ||
-      !appointment.date ||
-      !appointment.time ||
-      !appointment.motivo
+      !selectedTimeSlot ||
+      !appointment.motivo ||
+      !selectedDuration
     ) {
       setErrorMessage("Por favor, completa todos los campos requeridos.")
       return
     }
 
     try {
-      const fechaHora = `${appointment.date}T${appointment.time}`
+      const [hours, minutes] = selectedTimeSlot.split(":").map(Number)
+      const appointmentDate = new Date(selectedDate)
+      appointmentDate.setHours(hours, minutes, 0, 0)
+
+      // Verificar que la fecha y hora no sean pasadas
+      const now = new Date()
+      if (appointmentDate < now) {
+        setErrorMessage("No se pueden agendar citas en fechas u horas pasadas.")
+        return
+      }
+
+      const fechaHora = appointmentDate.toISOString()
+
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/citas`, {
         method: "POST",
         headers: {
@@ -149,6 +401,7 @@ const AgendarCitasView: React.FC = () => {
           mascota_id: Number.parseInt(appointment.mascota_id),
           veterinario_id: Number.parseInt(appointment.veterinario_id),
           fecha_hora: fechaHora,
+          duracion_estimada: selectedDuration,
           motivo: appointment.motivo,
         }),
       })
@@ -159,11 +412,19 @@ const AgendarCitasView: React.FC = () => {
           propietario_id: "",
           mascota_id: "",
           veterinario_id: "",
-          date: "",
-          time: "",
           motivo: "",
         })
         setSelectedOwner(null)
+        setSelectedTimeSlot(null)
+        setShowCalendar(false)
+
+        // Actualizar la lista de citas para la fecha seleccionada
+        const dateString = selectedDate.toISOString().split("T")[0]
+        const updatedAppointmentsResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/citas/fecha/${dateString}`)
+        if (updatedAppointmentsResponse.ok) {
+          const updatedAppointmentsData = await updatedAppointmentsResponse.json()
+          setDateAppointments(updatedAppointmentsData)
+        }
       } else {
         setErrorMessage("Error al agendar la cita: " + response.statusText)
       }
@@ -191,8 +452,23 @@ const AgendarCitasView: React.FC = () => {
     }))
   }
 
-  // Get minimum date (today) for the date picker
-  const today = new Date().toISOString().split("T")[0]
+  // Formatear fecha para mostrar
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString("es-ES", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    })
+  }
+
+  // Obtener la fecha mínima (hoy) para el selector de fecha
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const isToday =
+    selectedDate.getDate() === today.getDate() &&
+    selectedDate.getMonth() === today.getMonth() &&
+    selectedDate.getFullYear() === today.getFullYear()
 
   if (loading) {
     return (
@@ -223,10 +499,11 @@ const AgendarCitasView: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Form Section */}
         <div className="lg:col-span-2">
-          <div className="bg-white rounded-xl shadow-md overflow-hidden">
+          {/* Formulario de cita */}
+          <div className="bg-white rounded-xl shadow-md overflow-hidden mb-6">
             <div className="bg-gradient-to-r from-pink-600 to-purple-600 text-white px-6 py-3 flex items-center">
-              <Calendar className="h-5 w-5 mr-2" />
-              <h2 className="text-lg font-semibold">Formulario de Cita</h2>
+              <FileText className="h-5 w-5 mr-2" />
+              <h2 className="text-lg font-semibold">Detalles de la Cita</h2>
             </div>
 
             <form onSubmit={handleSubmit} className="p-6 space-y-6">
@@ -367,37 +644,6 @@ const AgendarCitasView: React.FC = () => {
                   </select>
                 </div>
 
-                <div>
-                  <label htmlFor="date" className="block text-sm font-medium text-gray-700 mb-1">
-                    Fecha <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="date"
-                    id="date"
-                    name="date"
-                    value={appointment.date}
-                    onChange={handleChange}
-                    min={today}
-                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="time" className="block text-sm font-medium text-gray-700 mb-1">
-                    Hora <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="time"
-                    id="time"
-                    name="time"
-                    value={appointment.time}
-                    onChange={handleChange}
-                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
-                    required
-                  />
-                </div>
-
                 <div className="md:col-span-2">
                   <label htmlFor="motivo" className="block text-sm font-medium text-gray-700 mb-1">
                     Motivo de la cita <span className="text-red-500">*</span>
@@ -415,12 +661,108 @@ const AgendarCitasView: React.FC = () => {
                 </div>
               </div>
 
+              {!appointment.veterinario_id && (
+                <div className="bg-blue-50 border border-blue-200 text-blue-800 rounded-lg p-4 flex items-start">
+                  <Info className="h-5 w-5 mr-2 text-blue-600 mt-0.5" />
+                  <p>Seleccione un veterinario para ver su disponibilidad en el calendario.</p>
+                </div>
+              )}
+
+              {showCalendar && (
+                <div className="mt-6 pt-6 border-t border-gray-200">
+                  <h3 className="text-lg font-medium text-gray-800 mb-4">Seleccione fecha y hora</h3>
+
+                  {/* Selector de fecha con calendario */}
+                  <div className="mb-6">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Fecha de la cita</label>
+                    <div className="relative">
+                      <button
+                        type="button"
+                        onClick={() => setShowCalendarPicker(!showCalendarPicker)}
+                        className="w-full md:w-64 flex items-center justify-between p-2 border border-gray-300 rounded-lg hover:border-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-500"
+                      >
+                        <div className="flex items-center">
+                          <CalendarIcon className="h-5 w-5 mr-2 text-gray-500" />
+                          <span>
+                            {isToday ? "Hoy" : ""} {formatDate(selectedDate)}
+                          </span>
+                        </div>
+                        <span className="text-gray-500">{showCalendarPicker ? "▲" : "▼"}</span>
+                      </button>
+
+                      {showCalendarPicker && (
+                        <div className="absolute z-10 mt-1 w-full md:w-auto">
+                          <CalendarPicker selectedDate={selectedDate} onDateSelect={handleDateSelect} />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Selector de duración */}
+                  <div className="mb-6">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Duración de la cita</label>
+                    <select
+                      value={selectedDuration}
+                      onChange={handleDurationChange}
+                      className="w-full md:w-64 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
+                    >
+                      <option value={1}>30 minutos (1 bloque)</option>
+                      <option value={2}>1 hora (2 bloques)</option>
+                      <option value={3}>1 hora 30 minutos (3 bloques)</option>
+                      <option value={4}>2 horas (4 bloques)</option>
+                    </select>
+                  </div>
+
+                  {/* Horarios disponibles */}
+                  <div className="mb-4">
+                    <h4 className="text-md font-medium text-gray-800 mb-2">
+                      Horarios disponibles para {vets.find((v) => v.id === Number(appointment.veterinario_id))?.nombre}
+                    </h4>
+                    <p className="text-sm text-gray-600 mb-4">
+                      Seleccione un horario disponible para la cita. Los bloques ocupados o pasados no están
+                      disponibles.
+                    </p>
+                  </div>
+
+                  {loadingAppointments ? (
+                    <div className="flex justify-center items-center h-32">
+                      <div className="animate-pulse text-pink-600">Cargando horarios disponibles...</div>
+                    </div>
+                  ) : (
+                    <TimeSlotGrid
+                      selectedDate={selectedDate}
+                      appointments={appointment.veterinario_id ? vetAppointments : dateAppointments}
+                      selectedDuration={selectedDuration}
+                      selectedTimeSlot={selectedTimeSlot}
+                      onTimeSlotSelect={handleTimeSlotSelect}
+                    />
+                  )}
+
+                  {selectedTimeSlot && (
+                    <div className="mt-4 p-3 bg-pink-50 border border-pink-200 rounded-lg text-pink-800">
+                      <p className="font-medium">Horario seleccionado: {selectedTimeSlot}</p>
+                      <p>Duración: {selectedDuration * 30} minutos</p>
+                      <p>
+                        Hora de finalización: {(() => {
+                          const [hours, minutes] = selectedTimeSlot.split(":").map(Number)
+                          const endTime = new Date(selectedDate)
+                          endTime.setHours(hours, minutes, 0, 0)
+                          endTime.setMinutes(endTime.getMinutes() + selectedDuration * 30)
+                          return `${endTime.getHours().toString().padStart(2, "0")}:${endTime.getMinutes().toString().padStart(2, "0")}`
+                        })()}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+
               <div className="flex justify-end">
                 <button
                   type="submit"
                   className="px-6 py-2 bg-gradient-to-r from-pink-600 to-purple-600 text-white rounded-lg hover:from-pink-700 hover:to-purple-700 transition-colors flex items-center"
+                  disabled={!selectedTimeSlot && showCalendar}
                 >
-                  <Calendar className="h-5 w-5 mr-2" />
+                  <CalendarIcon className="h-5 w-5 mr-2" />
                   Agendar Cita
                 </button>
               </div>
@@ -466,6 +808,15 @@ const AgendarCitasView: React.FC = () => {
                   <p className="text-sm text-gray-600">
                     Total de veterinarios disponibles: <span className="font-medium">{vets.length}</span>
                   </p>
+                  {appointment.veterinario_id && (
+                    <p className="text-sm text-pink-600 mt-2">
+                      Mostrando disponibilidad para:{" "}
+                      <span className="font-medium">
+                        {vets.find((v) => v.id === Number(appointment.veterinario_id))?.nombre ||
+                          "Veterinario seleccionado"}
+                      </span>
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -475,7 +826,7 @@ const AgendarCitasView: React.FC = () => {
                   Horarios Disponibles
                 </h3>
                 <p className="text-sm text-gray-600 mb-2">
-                  Horario de atención: <span className="font-medium">9:00 AM - 6:00 PM</span>
+                  Horario de atención: <span className="font-medium">24 horas</span>
                 </p>
                 <p className="text-sm text-gray-600">
                   Duración estándar de cita: <span className="font-medium">30 minutos</span>
@@ -496,6 +847,33 @@ const AgendarCitasView: React.FC = () => {
                   </ul>
                 </div>
               </div>
+
+              {selectedTimeSlot && (
+                <div className="mt-6 pt-6 border-t border-gray-100">
+                  <div className="bg-green-50 rounded-lg p-4">
+                    <h3 className="text-md font-medium text-green-800 flex items-center mb-2">
+                      <CheckCircle className="h-5 w-5 text-green-600 mr-2" />
+                      Resumen de Cita
+                    </h3>
+                    <ul className="text-sm text-green-700 space-y-2">
+                      <li>
+                        <strong>Fecha:</strong> {formatDate(selectedDate)}
+                      </li>
+                      <li>
+                        <strong>Hora:</strong> {selectedTimeSlot}
+                      </li>
+                      <li>
+                        <strong>Duración:</strong> {selectedDuration * 30} minutos
+                      </li>
+                      {selectedOwner && (
+                        <li>
+                          <strong>Propietario:</strong> {selectedOwner.nombre}
+                        </li>
+                      )}
+                    </ul>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

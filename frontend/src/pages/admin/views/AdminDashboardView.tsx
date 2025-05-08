@@ -21,10 +21,7 @@ interface AdminDashboardViewProps {
   vetCount: number
   receptionistCount: number
   ownerCount: number
-  petCount: number
-  setActiveView: (
-    view: "dashboard" | "veterinarios" | "recepcionistas" | "propietarios" | "mascotas" | "registrar",
-  ) => void
+  setActiveView: (view: "dashboard" | "veterinarios" | "recepcionistas" | "propietarios" | "registrar") => void
 }
 
 interface StatCard {
@@ -40,7 +37,6 @@ const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
   vetCount,
   receptionistCount,
   ownerCount,
-  petCount,
   setActiveView,
 }) => {
   const [recentVets, setRecentVets] = useState<any[]>([])
@@ -99,14 +95,6 @@ const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
       bgColor: "bg-indigo-600",
       onClick: () => setActiveView("propietarios"),
     },
-    {
-      title: "Mascotas",
-      value: petCount,
-      icon: <PawPrint className="h-6 w-6" />,
-      color: "text-amber-600",
-      bgColor: "bg-amber-600",
-      onClick: () => setActiveView("mascotas"),
-    },
   ]
 
   if (loading) {
@@ -132,7 +120,7 @@ const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {stats.map((stat, index) => (
           <div
             key={index}
@@ -210,19 +198,7 @@ const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
                     <div className="w-full bg-gray-200 rounded-full h-2">
                       <div
                         className="bg-indigo-600 h-2 rounded-full"
-                        style={{ width: `${(ownerCount / (ownerCount + petCount)) * 100}%` }}
-                      ></div>
-                    </div>
-                  </div>
-                  <div>
-                    <div className="flex justify-between text-sm mb-1">
-                      <span className="font-medium">Mascotas</span>
-                      <span>{petCount}</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div
-                        className="bg-amber-600 h-2 rounded-full"
-                        style={{ width: `${(petCount / (ownerCount + petCount)) * 100}%` }}
+                        style={{ width: `${(ownerCount / ownerCount) * 100}%` }}
                       ></div>
                     </div>
                   </div>
@@ -343,7 +319,7 @@ const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({
           </div>
 
           <div
-            onClick={() => setActiveView("mascotas")}
+            onClick={() => setActiveView("propietarios")}
             className="bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-xl p-5 cursor-pointer hover:shadow-lg transition-all"
           >
             <PawPrint className="h-8 w-8 mb-3" />

@@ -54,7 +54,7 @@ function RecepcionistPage() {
 
           // Try to get receptionist name
           try {
-            const recepResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/recepcionistas/${userId}`)
+            const recepResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/recepcionistas/usuario/${userId}`)
             if (recepResponse.ok) {
               const recepData = await recepResponse.json()
               if (recepData && recepData.nombre) {

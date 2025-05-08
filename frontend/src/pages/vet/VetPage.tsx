@@ -13,8 +13,8 @@ import VetConsultationsView from "./views/VetConsultationsView"
 
 interface Appointment {
   id: number
-  mascota_nombre: string
-  propietario_nombre: string
+  mascota: string
+  propietario: string
   fecha_hora: string
   motivo: string
 }
@@ -28,7 +28,7 @@ interface MedicalRecord {
 
 interface Consultation {
   id: number
-  mascota_nombre: string
+  mascota: string
   descripcion: string
   tratamiento: string
   fecha: string
@@ -47,6 +47,7 @@ function VetPage() {
     fecha: "",
   })
   const [vetName, setVetName] = useState<string>("Veterinario")
+  const [vetId, setVetId] = useState<string>()
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false)
   const navigate = useNavigate()
 
@@ -69,11 +70,13 @@ function VetPage() {
 
           // Fetch vet name
           try {
-            const vetResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/veterinarios/${userId}`)
+            const vetResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/veterinarios/usuario/${userId}`)
             if (vetResponse.ok) {
               const vetData = await vetResponse.json()
-              if (vetData && vetData.nombre) {
+
+              if (vetData && vetData.nombre && vetData.id) {
                 setVetName(vetData.nombre)
+                setVetId(vetData.id)
               }
             }
           } catch (error) {
@@ -93,8 +96,9 @@ function VetPage() {
 
   useEffect(() => {
     const fetchAppointments = async () => {
+      if (!vetId) return
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/citas/veterinario/${userId}`)
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/citas/veterinario/${vetId}`)
         const data = await response.json()
         if (Array.isArray(data)) {
           setAppointments(data)
@@ -111,12 +115,12 @@ function VetPage() {
     if (isAuthorized) {
       fetchAppointments()
     }
-  }, [isAuthorized, userId])
+  }, [isAuthorized, userId, vetId])
 
   useEffect(() => {
     const fetchConsultations = async () => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/consultas/veterinario/${userId}`)
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/consultas/veterinario/${vetId}`)
         const data = await response.json()
         if (Array.isArray(data)) {
           setConsultations(data)
@@ -130,10 +134,10 @@ function VetPage() {
       }
     }
 
-    if (isAuthorized) {
+    if (isAuthorized && vetId) {
       fetchConsultations()
     }
-  }, [isAuthorized, userId])
+  }, [isAuthorized, userId, vetId])
 
   const handleMedicalRecordChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
