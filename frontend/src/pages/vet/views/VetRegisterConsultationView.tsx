@@ -63,12 +63,16 @@ const VetRegisterConsultationView: React.FC<VetRegisterConsultationViewProps> = 
                     className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                     required
                   >
-                    <option value="">Seleccionar paciente</option>
-                    {appointments.map((appt) => (
-                      <option key={appt.id} value={appt.id}>
-                        {appt.mascota} - {appt.propietario}
-                      </option>
-                    ))}
+                  <option value="">Seleccionar paciente</option>
+                  {Array.from(
+                    new Map(
+                      appointments.map((appt) => [appt.mascota, appt])
+                    ).values()
+                  ).map((appt) => (
+                    <option key={appt.id} value={appt.id}>
+                      {appt.mascota} - {appt.propietario}
+                    </option>
+                  ))}
                   </select>
                 </div>
 
